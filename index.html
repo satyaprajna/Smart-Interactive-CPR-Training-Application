@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPR Master - Interactive Training</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .training-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .patient-area {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .patient-body {
+            width: 200px;
+            height: 300px;
+            margin: 0 auto 20px;
+            position: relative;
+            background: #f0f0f0;
+            border-radius: 100px 100px 50px 50px;
+            border: 3px solid #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .patient-body:hover {
+            transform: scale(1.05);
+        }
+
+        .chest-area {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            border: 4px solid #ff5252;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        .chest-area.compressed {
+            transform: translateX(-50%) scale(0.9);
+            background: #4CAF50;
+            border-color: #45a049;
+        }
+
+        .feedback-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ff6b6b, #ff5252);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #4CAF50;
+        }
+
+        .voice-feedback {
+            background: #e3f2fd;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #1976d2;
+        }
+
+        .gamification {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .achievement-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .achievement-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .timer {
+            font-size: 3rem;
+            font-weight: bold;
+            text-align: center;
+            color: #ff6b6b;
+            margin: 20px 0;
+        }
+
+        .scenario-selector {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .scenario-btn {
+            padding: 8px 16px;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .scenario-btn.active {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .quality-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .indicator-light {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ccc;
+            transition: all 0.3s ease;
+        }
+
+        .indicator-light.good {
+            background: #4CAF50;
+            box-shadow: 0 0 10px #4CAF50;
+        }
+
+        .indicator-light.warning {
+            background: #ff9800;
+            box-shadow: 0 0 10px #ff9800;
+        }
+
+        .indicator-light.error {
+            background: #f44336;
+            box-shadow: 0 0 10px #f44336;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .pulse-animation {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .metronome {
+            width: 60px;
+            height: 60px;
+            background: #4CAF50;
+            border-radius: 50%;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .metronome.beat {
+            transform: scale(1.2);
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚑 CPR Master Training</h1>
+            <p>Interactive CPR Training with Real-time Feedback</p>
+        </div>
+
+        <div class="main-content">
+            <div class="training-panel">
+                <h2>Virtual Patient</h2>
+                
+                <div class="scenario-selector">
+                    <button class="scenario-btn active" onclick="selectScenario('adult')">Adult</button>
+                    <button class="scenario-btn" onclick="selectScenario('child')">Child</button>
+                    <button class="scenario-btn" onclick="selectScenario('infant')">Infant</button>
+                </div>
+
+                <div class="patient-area">
+                    <div class="patient-body" onclick="performCompression()">
+                        <div class="chest-area" id="chestArea">💓</div>
+                    </div>
+                    <p><strong>Click on the chest to perform compressions</strong></p>
+                </div>
+
+                <div class="metronome" id="metronome">♪</div>
+
+                <div class="timer" id="timer">00:00</div>
+
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="startTraining()">Start Training</button>
+                    <button class="btn btn-secondary" onclick="stopTraining()">Stop</button>
+                    <button class="btn btn-primary" onclick="resetSession()">Reset</button>
+                </div>
+
+                <div class="instructions" id="instructions">
+                    <h3>📋 Instructions</h3>
+                    <p>1. Place hands on center of chest</p>
+                    <p>2. Push hard and fast at least 2 inches deep</p>
+                    <p>3. Allow complete chest recoil between compressions</p>
+                    <p>4. Minimize interruptions</p>
+                </div>
+            </div>
+
+            <div class="feedback-panel">
+                <h2>Real-time Feedback</h2>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="compressionRate">0</div>
+                        <div class="metric-label">Compressions/min</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="rateProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-value" id="depthScore">0%</div>
+                        <div class="metric-label">Depth Accuracy</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="depthProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quality-indicator">
+                    <div class="indicator-light" id="rateIndicator"></div>
+                    <span>Compression Rate (100-120/min)</span>
+                </div>
+                
+                <div class="quality-indicator">
+                    <div class="indicator-light" id="depthIndicator"></div>
+                    <span>Compression Depth (2+ inches)</span>
+                </div>
+                
+                <div class="quality-indicator">
+                    <div class="indicator-light" id="recoilIndicator"></div>
+                    <span>Complete Chest Recoil</span>
+                </div>
+
+                <div class="voice-feedback" id="voiceFeedback">
+                    🎤 Click "Start Training" to begin
+                </div>
+
+                <div class="instructions">
+                    <h3>📊 Performance Stats</h3>
+                    <p><strong>Total Compressions:</strong> <span id="totalCompressions">0</span></p>
+                    <p><strong>Effective Compressions:</strong> <span id="effectiveCompressions">0</span></p>
+                    <p><strong>Overall Score:</strong> <span id="overallScore">0%</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="gamification">
+            <div class="achievement-card">
+                <div class="achievement-icon">🏆</div>
+                <h3>First Responder</h3>
+                <p>Complete your first CPR session</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="achievement1" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="achievement-card">
+                <div class="achievement-icon">⚡</div>
+                <h3>Speed Demon</h3>
+                <p>Maintain 100+ compressions/min</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="achievement2" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="achievement-card">
+                <div class="achievement-icon">🎯</div>
+                <h3>Precision Master</h3>
+                <p>Achieve 90%+ depth accuracy</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="achievement3" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="achievement-card">
+                <div class="achievement-icon">💪</div>
+                <h3>Endurance Champion</h3>
+                <p>Perform CPR for 5+ minutes</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="achievement4" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isTraining = false;
+        let startTime = 0;
+        let compressions = [];
+        let totalCompressions = 0;
+        let effectiveCompressions = 0;
+        let currentScenario = 'adult';
+        let metronomeInterval;
+        let timerInterval;
+        let feedbackInterval;
+
+        const scenarios = {
+            adult: { minDepth: 2, maxDepth: 2.4, targetRate: 110 },
+            child: { minDepth: 1.5, maxDepth: 2, targetRate: 110 },
+            infant: { minDepth: 1, maxDepth: 1.5, targetRate: 110 }
+        };
+
+        function selectScenario(scenario) {
+            currentScenario = scenario;
+            document.querySelectorAll('.scenario-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            updateInstructions();
+            updateVoiceFeedback(`Switched to ${scenario} CPR mode`);
+        }
+
+        function updateInstructions() {
+            const scenario = scenarios[currentScenario];
+            const instructions = document.getElementById('instructions');
+            instructions.innerHTML = `
+                <h3>📋 ${currentScenario.charAt(0).toUpperCase() + currentScenario.slice(1)} CPR Instructions</h3>
+                <p>1. Compression depth: ${scenario.minDepth}-${scenario.maxDepth} inches</p>
+                <p>2. Target rate: ${scenario.targetRate} compressions/min</p>
+                <p>3. Allow complete chest recoil</p>
+                <p>4. Minimize interruptions</p>
+            `;
+        }
+
+        function startTraining() {
+            if (isTraining) return;
+            
+            isTraining = true;
+            startTime = Date.now();
+            compressions = [];
+            totalCompressions = 0;
+            effectiveCompressions = 0;
+            
+            updateVoiceFeedback("Training started! Begin compressions now!");
+            
+            // Start metronome
+            startMetronome();
+            
+            // Start timer
+            timerInterval = setInterval(updateTimer, 1000);
+            
+            // Start feedback updates
+            feedbackInterval = setInterval(updateFeedback, 500);
+        }
+
+        function stopTraining() {
+            isTraining = false;
+            clearInterval(metronomeInterval);
+            clearInterval(timerInterval);
+            clearInterval(feedbackInterval);
+            
+            updateVoiceFeedback("Training stopped. Great job!");
+            calculateFinalScore();
+        }
+
+        function resetSession() {
+            stopTraining();
+            compressions = [];
+            totalCompressions = 0;
+            effectiveCompressions = 0;
+            
+            document.getElementById('timer').textContent = '00:00';
+            document.getElementById('compressionRate').textContent = '0';
+            document.getElementById('depthScore').textContent = '0%';
+            document.getElementById('totalCompressions').textContent = '0';
+            document.getElementById('effectiveCompressions').textContent = '0';
+            document.getElementById('overallScore').textContent = '0%';
+            
+            updateVoiceFeedback("Session reset. Ready to start training!");
+            resetIndicators();
+        }
+
+        function performCompression() {
+            if (!isTraining) return;
+            
+            const now = Date.now();
+            const compressionData = {
+                timestamp: now,
+                depth: Math.random() * 3 + 1, // Simulated depth
+                recoil: Math.random() > 0.2 // Simulated recoil
+            };
+            
+            compressions.push(compressionData);
+            totalCompressions++;
+            
+            // Visual feedback
+            const chestArea = document.getElementById('chestArea');
+            chestArea.classList.add('compressed');
+            setTimeout(() => chestArea.classList.remove('compressed'), 200);
+            
+            // Check if compression is effective
+            const scenario = scenarios[currentScenario];
+            if (compressionData.depth >= scenario.minDepth && 
+                compressionData.depth <= scenario.maxDepth && 
+                compressionData.recoil) {
+                effectiveCompressions++;
+            }
+            
+            updateCompressionStats();
+            provideFeedback(compressionData);
+        }
+
+        function startMetronome() {
+            const metronome = document.getElementById('metronome');
+            const targetRate = scenarios[currentScenario].targetRate;
+            const interval = 60000 / targetRate; // Convert to milliseconds
+            
+            metronomeInterval = setInterval(() => {
+                metronome.classList.add('beat');
+                setTimeout(() => metronome.classList.remove('beat'), 100);
+            }, interval);
+        }
+
+        function updateTimer() {
+            if (!isTraining) return;
+            
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            
+            document.getElementById('timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+            // Update endurance achievement
+            const enduranceProgress = Math.min((elapsed / 300) * 100, 100); // 5 minutes = 300 seconds
+            document.getElementById('achievement4').style.width = enduranceProgress + '%';
+        }
+
+        function updateFeedback() {
+            if (!isTraining || compressions.length === 0) return;
+            
+            const now = Date.now();
+            const recentCompressions = compressions.filter(c => now - c.timestamp < 60000); // Last minute
+            
+            // Calculate rate
+            const rate = recentCompressions.length;
+            document.getElementById('compressionRate').textContent = rate;
+            
+            // Update rate progress and indicator
+            const targetRate = scenarios[currentScenario].targetRate;
+            const rateProgress = Math.min((rate / targetRate) * 100, 100);
+            document.getElementById('rateProgress').style.width = rateProgress + '%';
+            
+            const rateIndicator = document.getElementById('rateIndicator');
+            if (rate >= 100 && rate <= 120) {
+                rateIndicator.className = 'indicator-light good';
+            } else if (rate >= 80 && rate <= 140) {
+                rateIndicator.className = 'indicator-light warning';
+            } else {
+                rateIndicator.className = 'indicator-light error';
+            }
+            
+            // Calculate depth accuracy
+            const scenario = scenarios[currentScenario];
+            const goodDepthCompressions = recentCompressions.filter(c => 
+                c.depth >= scenario.minDepth && c.depth <= scenario.maxDepth
+            ).length;
+            
+            const depthAccuracy = recentCompressions.length > 0 ? 
+                Math.round((goodDepthCompressions / recentCompressions.length) * 100) : 0;
+            
+            document.getElementById('depthScore').textContent = depthAccuracy + '%';
+            document.getElementById('depthProgress').style.width = depthAccuracy + '%';
+            
+            const depthIndicator = document.getElementById('depthIndicator');
+            if (depthAccuracy >= 90) {
+                depthIndicator.className = 'indicator-light good';
+            } else if (depthAccuracy >= 70) {
+                depthIndicator.className = 'indicator-light warning';
+            } else {
+                depthIndicator.className = 'indicator-light error';
+            }
+            
+            // Update recoil indicator (simulated)
+            const recoilRate = recentCompressions.filter(c => c.recoil).length / recentCompressions.length;
+            const recoilIndicator = document.getElementById('recoilIndicator');
+            if (recoilRate >= 0.9) {
+                recoilIndicator.className = 'indicator-light good';
+            } else if (recoilRate >= 0.7) {
+                recoilIndicator.className = 'indicator-light warning';
+            } else {
+                recoilIndicator.className = 'indicator-light error';
+            }
+            
+            // Update achievements
+            updateAchievements(rate, depthAccuracy);
+        }
+
+        function updateCompressionStats() {
+            document.getElementById('totalCompressions').textContent = totalCompressions;
+            document.getElementById('effectiveCompressions').textContent = effectiveCompressions;
+            
+            const effectiveness = totalCompressions > 0 ? 
+                Math.round((effectiveCompressions / totalCompressions) * 100) : 0;
+            document.getElementById('overallScore').textContent = effectiveness + '%';
+        }
+
+        function provideFeedback(compressionData) {
+            const scenario = scenarios[currentScenario];
+            let feedback = "";
+            
+            if (compressionData.depth < scenario.minDepth) {
+                feedback = "Push deeper! Compress at least " + scenario.minDepth + " inches";
+            } else if (compressionData.depth > scenario.maxDepth) {
+                feedback = "Too deep! Reduce compression depth";
+            } else if (!compressionData.recoil) {
+                feedback = "Allow complete chest recoil between compressions";
+            } else {
+                feedback = "Good compression! Keep it up!";
+            }
+            
+            updateVoiceFeedback(feedback);
+        }
+
+        function updateVoiceFeedback(message) {
+            document.getElementById('voiceFeedback').textContent = '🎤 ' + message;
+        }
+
+        function updateAchievements(rate, depthAccuracy) {
+            // First Responder achievement
+            if (totalCompressions > 0) {
+                document.getElementById('achievement1').style.width = '100%';
+            }
+            
+            // Speed Demon achievement
+            if (rate >= 100) {
+                const speedProgress = Math.min(((rate - 100) / 20) * 100, 100);
+                document.getElementById('achievement2').style.width = speedProgress + '%';
+            }
+            
+            // Precision Master achievement
+            const precisionProgress = Math.min((depthAccuracy / 90) * 100, 100);
+            document.getElementById('achievement3').style.width = precisionProgress + '%';
+        }
+
+        function calculateFinalScore() {
+            const effectiveness = totalCompressions > 0 ? 
+                (effectiveCompressions / totalCompressions) * 100 : 0;
+            
+            let grade = 'F';
+            if (effectiveness >= 90) grade = 'A';
+            else if (effectiveness >= 80) grade = 'B';
+            else if (effectiveness >= 70) grade = 'C';
+            else if (effectiveness >= 60) grade = 'D';
+            
+            updateVoiceFeedback(`Training complete! Final grade: ${grade} (${Math.round(effectiveness)}% effective)`);
+        }
+
+        function resetIndicators() {
+            document.querySelectorAll('.indicator-light').forEach(light => {
+                light.className = 'indicator-light';
+            });
+            
+            document.querySelectorAll('.progress-fill').forEach(fill => {
+                fill.style.width = '0%';
+            });
+        }
+
+        // Initialize
+        updateInstructions();
+        updateVoiceFeedback("Welcome to CPR Master! Select a scenario and click 'Start Training' to begin.");
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9642b418315d8fbe',t:'MTc1MzM1MjYyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
+  
